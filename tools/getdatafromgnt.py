@@ -45,7 +45,7 @@ import pickle
 import random
 
 
-traindirname = "/home/allen/work/data/limitclass/train100class"
+traindirnames = "/home/allen/work/data/limitclass/train100class"
 testdirname = "/home/allen/work/data/limitclass/test100class"
 
 descharacterTagcodeMapFile = "/home/allen/work/data/100class.pkl"

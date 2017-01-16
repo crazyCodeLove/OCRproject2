@@ -34,6 +34,7 @@ train data 100 class,character number is:
 #####   HWDB1.0  end   ####
 
 
+all db1.1 and db1.0 character number is:2678424
 
 
 #####  compete test data start     ####
@@ -512,6 +513,44 @@ def convtDB0():
     convertdb0_ori_to_des(orifilename, testdesdirnamev0, 417)
 
 
+def convertcompeteDB2deslimit():
+    global desCharSize
+    competeoridirname = "/home/allen/work/data/competeTestdes64"
+    competedesdirname = "/home/allen/work/data/cmptTestdes64limit"
+    limitnum = 2000
+    orifilenames = sorted(os.listdir(competeoridirname))
+    startindex = 1
+    itemLength = 2 + desCharSize*desCharSize
+
+    content = ""
+    for i in range(len(orifilenames)):
+        orifilename = os.path.join(competeoridirname,orifilenames[i])
+        print "start process",orifilename
+
+        rfobj = open(orifilename,mode='rb')
+        if len(content) == 0:
+            content = rfobj.read()
+        else:
+            content += rfobj.read()
+        rfobj.close()
+
+        while len(content)/itemLength>=limitnum:
+            desfilename = "c" + "{:0>4}".format(startindex) + ".gnt"
+            desfilename = os.path.join(competedesdirname, desfilename)
+            tcontent = content[:limitnum*itemLength]
+            content = content[limitnum*itemLength:]
+            with open(desfilename,mode='wb') as wfobj:
+                wfobj.write(tcontent)
+            startindex += 1
+
+    if len(content) != 0:
+        desfilename = "c" + "{:0>4}".format(startindex) + ".gnt"
+        desfilename = os.path.join(competedesdirname, desfilename)
+        with open(desfilename, mode='wb') as wfobj:
+            wfobj.write(content)
+    print "process done"
+
+
 
 
 
@@ -562,10 +601,12 @@ def test():
     db1tagcodefile = "/home/allen/work/data/tagindexmapdb1.pkl"
     db0tagcodefile = "/home/allen/work/data/tagindexmapdb0.pkl"
     competetagcodefile = "/home/allen/work/data/tagindexmapcompete.pkl"
+    competedesdirname = "/home/allen/work/data/cmptTestdes64limit"
 
-    fun3()
+    # convertcompeteDB2deslimit()
+    # fun3()
     # createTagIndexMap()
-    # calculateDesAllCharacterCount(testdesdirname,db1tagcodefile)
+    calculateDesAllCharacterCount(competedesdirname)
     # fromSrc2Des(compete_test_oridir,compete_test_desdir)
     # calculatCharCount(testoridirnamev0)
     # create_diff_two_DB(testoridirnamev0)

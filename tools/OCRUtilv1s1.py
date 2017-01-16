@@ -12,7 +12,7 @@ test data 100 class, character number is:  14202
 train data 100 class, character number is: 56987
 
 """
-import logging,os
+import logging,os,pickle
 import tensorflow as tf
 from tensorflow.contrib.layers.python.layers.layers import batch_norm
 
@@ -35,6 +35,25 @@ class MyLog(object):
         self.logger.debug(msg)
 
 
+def init(peizhifilename,peizhidict):
+    if not os.path.exists(peizhifilename):
+        with open(peizhifilename, mode='w') as wfobj:
+            pickle.dump(peizhidict,wfobj)
+
+def update_peizhi(peizhifilename, key, value):
+    """
+    更新配置文件中的配置项
+    """
+    with open(peizhifilename) as rfobj:
+        peizhi = pickle.load(rfobj)
+    peizhi[key] = value
+    with open(peizhifilename,mode='w') as wfobj:
+        pickle.dump(peizhi,wfobj)
+
+def get_peizhi_val(peizhifilename,key):
+    with open(peizhifilename) as rfobj:
+        peizhi = pickle.load(rfobj)
+    return peizhi[key]
 
 def get_accurate(prediction,labels):
     return tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(prediction,1),tf.arg_max(labels,1)),dtype=tf.float32))
@@ -211,8 +230,10 @@ def conv2fc(inputs):
     return fcl_inputs,fcl_in_features
 
 def down_learning_rate(test_acc, lr):
-    if test_acc >=0.8 and lr>5e-5:
+    if test_acc >= 0.8 and lr>5e-4:
         lr /= 5.0
+    elif test_acc > 0.8 and lr > 5e-5:
+        lr *= 0.8
     elif test_acc>0.9 and lr>1e-6:
         lr *= 0.9
     elif test_acc>0.95:
@@ -227,6 +248,8 @@ def empty_dir(dirname):
     for each in os.listdir(dirname):
         os.remove(os.path.join(dirname,each))
     return True
+
+
 
 def test():
     # loger = MyLog("/home/allen/work/temp/test.txt")
